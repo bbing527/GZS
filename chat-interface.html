@@ -1,0 +1,570 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<title>同层手机聊天</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --primary-pink: #ff8ab4;
+    --light-pink: #fcd5e8;
+    --mid-purple: #e0cffc;
+    --deep-purple: #d4bbf7;
+    --phone-bg-gradient: linear-gradient(140deg, var(--light-pink) 0%, var(--mid-purple) 50%, var(--deep-purple) 100%);
+    --frosted-glass-medium: rgba(60, 50, 80, 0.7);
+    --text-light: #f8f0fc;
+    --border-color: rgba(255, 154, 196, 0.45);
+}
+
+body { 
+    font-family: 'Segoe UI', 'Roboto', 'Noto Sans SC', sans-serif; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    min-height: 100vh;
+    background: var(--phone-bg-gradient);
+    font-size: 12px;
+    margin: 0;
+}
+
+.phone-container { 
+    width: 375px; 
+    height: 667px; 
+    background: var(--phone-bg-gradient); 
+    border-radius: 60px; 
+    padding: 14px; 
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.85); 
+}
+
+.phone-screen { 
+    width: 100%; 
+    height: 100%; 
+    background: #f8f8f8; 
+    border-radius: 45px; 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+    border: 1px solid rgba(0,0,0,0.1); 
+}
+
+.status-bar {
+    height: 44px;
+    background: rgba(0,0,0,0.03);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+}
+
+.chat-header { 
+    height: 60px;
+    background: var(--frosted-glass-medium);
+    backdrop-filter: blur(10px);
+    display: flex; 
+    align-items: center; 
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 18px;
+    cursor: pointer;
+    margin-right: 12px;
+    padding: 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+    display: none;
+}
+
+.back-btn:hover { background: rgba(255,255,255,0.1); }
+.back-btn.show { display: block; }
+
+.header-title { 
+    flex-grow: 1;
+    font-size: 18px; 
+    font-weight: 600; 
+    color: var(--text-light); 
+    text-align: center;
+}
+
+.content-area { 
+    flex-grow: 1; 
+    overflow: hidden; 
+    background: #fff; 
+    position: relative;
+}
+
+/* 聊天列表样式 */
+.chat-list-view { 
+    height: 100%; 
+    overflow-y: auto; 
+}
+
+.chat-item { 
+    padding: 12px 16px; 
+    border-bottom: 1px solid #f0f0f0; 
+    display: flex; 
+    align-items: center; 
+    cursor: pointer; 
+    transition: background 0.2s; 
+}
+
+.chat-item:hover { background: #f5f5f5; }
+.chat-item:active { background: #e8e8e8; }
+
+.avatar { 
+    width: 48px; 
+    height: 48px; 
+    border-radius: 8px; 
+    margin-right: 12px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 18px; 
+    font-weight: 600; 
+    color: white; 
+    background: linear-gradient(135deg, var(--primary-pink) 0%, var(--deep-purple) 100%); 
+}
+
+.chat-info { flex: 1; min-width: 0; }
+
+.chat-name { 
+    font-size: 16px; 
+    font-weight: 500; 
+    color: #000; 
+    margin-bottom: 4px; 
+}
+
+.chat-last-msg { 
+    font-size: 14px; 
+    color: #999; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap; 
+}
+
+.chat-meta { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-end; 
+    gap: 4px; 
+}
+
+.chat-time { font-size: 12px; color: #999; }
+
+.unread-badge { 
+    background: #ff3b30; 
+    color: white; 
+    border-radius: 10px; 
+    padding: 2px 6px; 
+    font-size: 12px; 
+    min-width: 18px; 
+    text-align: center; 
+    display: none; 
+}
+
+.unread-badge.show { display: block; }
+
+/* 聊天界面样式 */
+.chat-room-view { 
+    height: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    display: none;
+}
+
+.chat-room-view.active { display: flex; }
+
+.messages-container { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 16px; 
+    background: #f7f7f7; 
+}
+
+.message { 
+    margin-bottom: 16px; 
+    display: flex; 
+}
+
+.message.sent { justify-content: flex-end; }
+.message.received { justify-content: flex-start; }
+.message.group { justify-content: flex-start; }
+
+.message-bubble { 
+    max-width: 70%; 
+    padding: 10px 14px; 
+    border-radius: 18px; 
+    font-size: 16px; 
+    line-height: 1.4; 
+    position: relative;
+}
+
+.message.received .message-bubble { 
+    background: #fff; 
+    color: #000; 
+    border-bottom-left-radius: 4px; 
+}
+
+.message.sent .message-bubble { 
+    background: #007aff; 
+    color: #fff; 
+    border-bottom-right-radius: 4px; 
+}
+
+.message.group .message-bubble {
+    background: #fff;
+    color: #000;
+    border-bottom-left-radius: 4px;
+}
+
+.message.group .sender-name {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.message-time { 
+    font-size: 12px; 
+    color: #999; 
+    margin-top: 4px; 
+    text-align: center; 
+}
+
+/* 输入框样式 */
+.input-area {
+    padding: 10px 16px;
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.message-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 16px;
+    outline: none;
+}
+
+.send-btn {
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.send-btn:hover { background: #0056b3; }
+</style>
+</head>
+<body>
+<div class="phone-container">
+    <div class="phone-screen">
+        <div class="status-bar">
+            <span id="statusTime">07:30</span>
+            <span>🔋 100%</span>
+        </div>
+        <div class="chat-header">
+            <button class="back-btn" id="backBtn" onclick="showChatList()">←</button>
+            <div class="header-title" id="headerTitle">微信</div>
+        </div>
+        <div class="content-area">
+            <!-- 聊天列表界面 -->
+            <div class="chat-list-view" id="chatListView">
+                <!-- 由JavaScript生成 -->
+            </div>
+            <!-- 聊天界面 -->
+            <div class="chat-room-view" id="chatRoomView">
+                <div class="messages-container" id="messagesContainer">
+                    <!-- 由JavaScript生成 -->
+                </div>
+                <div class="input-area">
+                    <input type="text" class="message-input" id="messageInput" placeholder="输入消息...">
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 全局变量
+let currentChatData = '';
+let currentChatTarget = '';
+let allChatsData = {};
+
+// 发送命令到ST
+function sendCommandToST(command) {
+    try {
+        const chatInput = document.querySelector('#send_textarea');
+        if (chatInput) {
+            chatInput.value = command;
+            const sendBtn = document.querySelector('#send_but');
+            if (sendBtn) {
+                sendBtn.click();
+            }
+        }
+    } catch (error) {
+        console.error('发送命令失败:', error);
+    }
+}
+
+// 解析聊天数据
+function parseChatData(rawData) {
+    const lines = rawData.trim().split('\n');
+    const isChatList = rawData.includes('{联系人数据开始}');
+    const isGroupChat = rawData.includes('{我消息-') && !isChatList;
+    
+    if (isChatList) {
+        return parseContactList(lines);
+    } else if (isGroupChat) {
+        return parseGroupChat(lines);
+    } else {
+        return parseSingleChat(lines);
+    }
+}
+
+// 解析联系人列表
+function parseContactList(lines) {
+    const contacts = [];
+    for (let line of lines) {
+        line = line.trim();
+        if (line.includes('{联系人-')) {
+            const match = line.match(/\{联系人-(.*?)-(.*?)-(.*?)-(.*?)\}/);
+            if (match) {
+                contacts.push({
+                    name: match[1],
+                    lastMsg: match[2],
+                    time: match[3],
+                    unread: parseInt(match[4]) || 0
+                });
+            }
+        }
+    }
+    return { type: 'list', data: contacts };
+}
+
+// 解析群聊
+function parseGroupChat(lines) {
+    const messages = [];
+    const patterns = [
+        { regex: /\{我消息-(.*?)-(.*?)\}/, sender: '我' },
+        { regex: /\{高钟书消息-(.*?)-(.*?)\}/, sender: '高钟书' },
+        { regex: /\{乔九消息-(.*?)-(.*?)\}/, sender: '乔九' },
+        { regex: /\{忧消息-(.*?)-(.*?)\}/, sender: '忧' },
+        { regex: /\{姜姜消息-(.*?)-(.*?)\}/, sender: '姜姜' },
+        { regex: /\{孙进海消息-(.*?)-(.*?)\}/, sender: '孙进海' }
+    ];
+
+    for (let line of lines) {
+        line = line.trim();
+        for (let pattern of patterns) {
+            const match = line.match(pattern.regex);
+            if (match) {
+                messages.push({
+                    type: 'group',
+                    sender: pattern.sender,
+                    content: match[1],
+                    time: match[2]
+                });
+                break;
+            }
+        }
+    }
+    return { type: 'group', data: messages, target: '工作群聊' };
+}
+
+// 解析单独聊天
+function parseSingleChat(lines) {
+    const messages = [];
+    let contactName = '';
+    
+    const patterns = [
+        { regex: /\{高钟书消息-(.*?)-(.*?)\}/, name: '高钟书', type: 'received' },
+        { regex: /\{乔九消息-(.*?)-(.*?)\}/, name: '乔九', type: 'received' },
+        { regex: /\{忧消息-(.*?)-(.*?)\}/, name: '忧', type: 'received' },
+        { regex: /\{姜姜消息-(.*?)-(.*?)\}/, name: '姜姜', type: 'received' },
+        { regex: /\{孙进海消息-(.*?)-(.*?)\}/, name: '孙进海', type: 'received' },
+        { regex: /\{我消息-(.*?)-(.*?)\}/, name: '我', type: 'sent' }
+    ];
+    
+    for (let line of lines) {
+        line = line.trim();
+        for (let pattern of patterns) {
+            const match = line.match(pattern.regex);
+            if (match) {
+                if (pattern.type === 'received' && !contactName) {
+                    contactName = pattern.name;
+                }
+                messages.push({
+                    type: pattern.type,
+                    content: match[1],
+                    time: match[2]
+                });
+                break;
+            }
+        }
+    }
+    return { type: 'single', data: messages, target: contactName };
+}
+
+// 渲染界面
+function renderInterface(parsedData) {
+    if (parsedData.type === 'list') {
+        renderChatList(parsedData.data);
+    } else if (parsedData.type === 'group') {
+        renderChatRoom(parsedData.data, parsedData.target, true);
+    } else if (parsedData.type === 'single') {
+        renderChatRoom(parsedData.data, parsedData.target, false);
+    }
+}
+
+// 渲染聊天列表
+function renderChatList(contacts) {
+    const chatListView = document.getElementById('chatListView');
+    chatListView.innerHTML = contacts.map(contact => `
+        <div class="chat-item" onclick="openChat('${contact.name}')">
+            <div class="avatar">${contact.name.charAt(0)}</div>
+            <div class="chat-info">
+                <div class="chat-name">${contact.name}</div>
+                <div class="chat-last-msg">${contact.lastMsg}</div>
+            </div>
+            <div class="chat-meta">
+                <div class="chat-time">${contact.time}</div>
+                <div class="unread-badge ${contact.unread > 0 ? 'show' : ''}">${contact.unread}</div>
+            </div>
+        </div>
+    `).join('');
+
+    // 显示聊天列表
+    document.getElementById('chatListView').style.display = 'block';
+    document.getElementById('chatRoomView').classList.remove('active');
+    document.getElementById('backBtn').classList.remove('show');
+    document.getElementById('headerTitle').textContent = '微信';
+}
+
+// 渲染聊天室
+function renderChatRoom(messages, target, isGroup) {
+    currentChatTarget = target;
+    
+    const messagesContainer = document.getElementById('messagesContainer');
+    messagesContainer.innerHTML = messages.map(msg => {
+        if (isGroup) {
+            return `
+                <div class="message group">
+                    <div class="message-bubble">
+                        <div class="sender-name">${msg.sender}</div>
+                        ${msg.content}
+                        <div class="message-time">${msg.time}</div>
+                    </div>
+                </div>
+            `;
+        } else {
+            return `
+                <div class="message ${msg.type}">
+                    <div class="message-bubble">
+                        ${msg.content}
+                        <div class="message-time">${msg.time}</div>
+                    </div>
+                </div>
+            `;
+        }
+    }).join('');
+    
+    // 显示聊天室
+    document.getElementById('chatListView').style.display = 'none';
+    document.getElementById('chatRoomView').classList.add('active');
+    document.getElementById('backBtn').classList.add('show');
+    document.getElementById('headerTitle').textContent = target;
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+// 点击联系人
+function openChat(contactName) {
+    if (contactName === '工作群聊') {
+        sendCommandToST('点击工作群聊');
+    } else {
+        sendCommandToST(`点击${contactName}`);
+    }
+}
+
+// 返回聊天列表
+function showChatList() {
+    sendCommandToST('【手机操作】');
+}
+
+// 发送消息
+function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    if (!message) return;
+    
+    if (currentChatTarget === '工作群聊') {
+        sendCommandToST(`回复群聊消息：${message}`);
+    } else {
+        sendCommandToST(`回复${currentChatTarget}的消息：${message}`);
+    }
+    
+    input.value = '';
+}
+
+// 回车发送
+document.getElementById('messageInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+// 更新时间
+function updateTime() {
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    document.getElementById('statusTime').textContent = timeStr;
+}
+
+// 初始化
+function init() {
+    updateTime();
+    // 这里会从外部获取数据并渲染
+    if (window.chatData) {
+        const parsedData = parseChatData(window.chatData);
+        renderInterface(parsedData);
+    }
+}
+
+// 暴露全局函数供外部调用
+window.setChatData = function(data) {
+    window.chatData = data;
+    const parsedData = parseChatData(data);
+    renderInterface(parsedData);
+};
+
+// 页面加载完成
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
+```
