@@ -436,7 +436,7 @@ function renderInterface(parsedData) {
     if (parsedData.type === 'list') {
         renderChatList(parsedData.data);
     } else if (parsedData.type === 'group') {
-        renderChatRoom(parsedData.data, parsedData.target, true);
+        renderChatRoom(parsedData.data, parsedData.target, false);
     } else if (parsedData.type === 'single') {
         renderChatRoom(parsedData.data, parsedData.target, false);
     }
