@@ -372,11 +372,11 @@ function parseGroupChat(lines) {
     const messages = [];
     const patterns = [
         { regex: /\{我消息-(.*?)-(.*?)\}/, sender: '我' },
-        { regex: /\{高钟书消息-(.*?)-(.*?)\}/, sender: '高钟书' },
-        { regex: /\{乔九消息-(.*?)-(.*?)\}/, sender: '乔九' },
-        { regex: /\{忧消息-(.*?)-(.*?)\}/, sender: '忧' },
-        { regex: /\{姜姜消息-(.*?)-(.*?)\}/, sender: '姜姜' },
-        { regex: /\{孙进海消息-(.*?)-(.*?)\}/, sender: '孙进海' }
+        { regex: /\{高钟书-(.*?)-(.*?)\}/, sender: '高钟书' },
+        { regex: /\{乔九-(.*?)-(.*?)\}/, sender: '乔九' },
+        { regex: /\{忧-(.*?)-(.*?)\}/, sender: '忧' },
+        { regex: /\{姜姜-(.*?)-(.*?)\}/, sender: '姜姜' },
+        { regex: /\{孙进海-(.*?)-(.*?)\}/, sender: '孙进海' }
     ];
 
     for (let line of lines) {
@@ -403,11 +403,11 @@ function parseSingleChat(lines) {
     let contactName = '';
     
     const patterns = [
-        { regex: /\{高钟书消息-(.*?)-(.*?)\}/, name: '高钟书', type: 'received' },
-        { regex: /\{乔九消息-(.*?)-(.*?)\}/, name: '乔九', type: 'received' },
-        { regex: /\{忧消息-(.*?)-(.*?)\}/, name: '忧', type: 'received' },
-        { regex: /\{姜姜消息-(.*?)-(.*?)\}/, name: '姜姜', type: 'received' },
-        { regex: /\{孙进海消息-(.*?)-(.*?)\}/, name: '孙进海', type: 'received' },
+        { regex: /\{高钟书-(.*?)-(.*?)\}/, name: '高钟书', type: 'received' },
+        { regex: /\{乔九-(.*?)-(.*?)\}/, name: '乔九', type: 'received' },
+        { regex: /\{忧-(.*?)-(.*?)\}/, name: '忧', type: 'received' },
+        { regex: /\{姜姜-(.*?)-(.*?)\}/, name: '姜姜', type: 'received' },
+        { regex: /\{孙进海-(.*?)-(.*?)\}/, name: '孙进海', type: 'received' },
         { regex: /\{我消息-(.*?)-(.*?)\}/, name: '我', type: 'sent' }
     ];
     
